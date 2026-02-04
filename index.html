@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IvanWare — Store</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+
+/* ===== RAIN ===== */
+.rain{position:fixed;inset:0;pointer-events:none;z-index:0}
+.drop{
+  position:absolute;width:2px;height:22px;
+  background:linear-gradient(to bottom, rgba(150,190,200,.9), transparent);
+  animation:fall linear infinite;
+}
+@keyframes fall{from{transform:translateY(-120px)}to{transform:translateY(110vh)}}
+
+/* ===== BODY ===== */
+body{
+  background:radial-gradient(1200px 600px at 20% 0%, rgba(140,200,255,.08), transparent 60%),
+             radial-gradient(900px 500px at 80% 20%, rgba(255,255,255,.05), transparent 60%),
+             #0c0c0c;
+  color:#fff;
+  min-height:100vh;
+}
+.main{position:relative;z-index:1}
+
+/* ===== HEADER ===== */
+header{
+  background:rgba(0,0,0,.92);
+  backdrop-filter: blur(8px);
+  padding:15px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;top:0;z-index:10;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  animation:headerIn .55s ease;
+}
+@keyframes headerIn{
+  from{opacity:0;transform:translateY(-14px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.logo{
+  display:flex;align-items:center;gap:10px;
+  font-size:22px;font-weight:900;
+  color:white;text-decoration:none;
+  transition:.2s;
+}
+.logo:hover{opacity:.9;transform:translateY(-1px)}
+.logo img{display:block}
+
+.right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.right input,.right select{
+  padding:8px 10px;border-radius:12px;border:none;outline:none;
+  background:#111;color:#fff;
+  border:1px solid rgba(255,255,255,.14);
+  transition:.2s;
+}
+.right input:focus,.right select:focus{
+  border-color:rgba(255,255,255,.35);
+  transform:translateY(-1px);
+}
+.right select{cursor:pointer}
+
+.cart-btn{
+  background:#fff;color:#000;
+  padding:8px 12px;border-radius:999px;
+  cursor:pointer;font-weight:900;
+  transition:.18s;
+}
+.cart-btn:hover{transform:translateY(-1px);opacity:.95}
+
+.login-btn{
+  background:#111;color:#fff;
+  border:1px solid rgba(255,255,255,.18);
+  padding:8px 12px;border-radius:999px;
+  cursor:pointer;font-weight:900;
+  transition:.18s;
+}
+.login-btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.35)}
+.user-pill{display:none;gap:8px;align-items:center}
+.link{color:#fff;text-decoration:none;opacity:.9}
+.link:hover{opacity:1}
+
+/* ===== HERO ===== */
+.hero{
+  max-width:1200px;
+  margin:22px auto 0;
+  padding:0 20px;
+  animation:fadeUp .65s ease;
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(18px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.hero-box{
+  background:linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:20px;
+  padding:18px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.hero-title{font-size:20px;font-weight:900}
+.hero-sub{opacity:.8;margin-top:4px;font-size:13px;line-height:1.4}
+.hero-chip{
+  white-space:nowrap;
+  background:#fff;color:#000;
+  padding:10px 14px;border-radius:999px;
+  font-weight:900;
+  border:none;
+  cursor:pointer;
+  transition:.18s;
+}
+.hero-chip:hover{transform:translateY(-1px);opacity:.95}
+
+/* ===== PRODUCTS ===== */
+.wrap{max-width:1200px;margin:18px auto 60px;padding:0 20px}
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+}
+
+/* ===== CARD + STAGGER ANIMATION ===== */
+.card{
+  background:#141414;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.06);
+  transition:.22s;
+  position:relative;
+  opacity:0;
+  transform:translateY(14px);
+  animation:cardIn .55s ease forwards;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes cardIn{to{opacity:1;transform:translateY(0)}}
+.card:hover{transform:translateY(-6px)}
+.card::after{
+  content:"";
+  position:absolute;inset:-40%;
+  background:linear-gradient(110deg, transparent 35%, rgba(255,255,255,.08) 50%, transparent 65%);
+  transform:translateX(-60%) rotate(10deg);
+  transition:.55s;
+  pointer-events:none;
+}
+.card:hover::after{transform:translateX(60%) rotate(10deg)}
+
+.card img{width:100%;height:280px;object-fit:cover;display:block}
+.info{padding:12px}
+.price{font-weight:900;margin:6px 0}
+.tag{font-size:12px;opacity:.8}
+.add{
+  width:100%;
+  padding:9px;
+  border:none;
+  border-radius:12px;
+  background:#fff;
+  cursor:pointer;
+  font-weight:900;
+  transition:.18s;
+}
+.add:hover{transform:translateY(-1px);opacity:.95}
+.add:active{transform:translateY(0) scale(.99)}
+
+/* ===== CART ===== */
+.cart{
+  position:fixed;
+  right:-390px;
+  top:0;
+  width:360px;
+  height:100%;
+  background:#fff;
+  color:#000;
+  padding:15px;
+  transition:.28s;
+  z-index:50;
+  overflow:auto;
+  box-shadow:-20px 0 60px rgba(0,0,0,.5);
+}
+.cart.open{right:0}
+.cart-top{display:flex;justify-content:space-between;align-items:center}
+.close{border:none;padding:6px 10px;cursor:pointer;background:#eee;border-radius:10px;font-weight:900}
+.cart-item{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
+.cart-item .x{cursor:pointer}
+.total{font-weight:900;margin:10px 0;font-size:18px}
+
+.form-title{margin-top:8px;font-size:16px}
+.cart input{
+  width:100%;
+  margin-top:8px;
+  padding:10px;
+  border-radius:12px;
+  border:1px solid rgba(0,0,0,.18);
+  outline:none;
+}
+.pay-btn{
+  width:100%;
+  margin-top:10px;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:#000;
+  color:#fff;
+  cursor:pointer;
+  font-weight:900;
+  transition:.18s;
+}
+.pay-btn:hover{opacity:.92;transform:translateY(-1px)}
+.pay-btn:active{transform:translateY(0) scale(.99)}
+
+/* ===== RIP + MEME ===== */
+.rip{
+  display:none;
+  position:fixed;
+  top:18px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#111;
+  border:1px solid rgba(255,255,255,.18);
+  padding:10px 14px;
+  border-radius:12px;
+  z-index:200;
+  font-weight:900;
+  animation:pop .25s ease;
+}
+@keyframes pop{
+  from{opacity:0;transform:translateX(-50%) translateY(-8px) scale(.98)}
+  to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+}
+#meme{
+  display:none;
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  width:260px;
+  border-radius:14px;
+  border:2px solid rgba(255,255,255,.25);
+  z-index:200;
+  animation:memeIn .22s ease;
+}
+@keyframes memeIn{
+  from{opacity:0;transform:translateY(8px) scale(.98)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* ===== SUCCESS MODAL ===== */
+.success{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.72);
+  z-index:500;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+.success-card{
+  width:min(440px, 100%);
+  background:linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:22px;
+  padding:22px 18px;
+  text-align:center;
+  color:#fff;
+  animation:successIn .35s ease;
+  box-shadow:0 0 60px rgba(255,255,255,.07);
+}
+@keyframes successIn{
+  from{opacity:0;transform:translateY(14px) scale(.98)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+.success-icon{
+  font-size:34px;
+}
+.success-title{
+  margin-top:8px;
+  font-size:20px;
+  font-weight:900;
+}
+.success-text{
+  margin-top:8px;
+  opacity:.9;
+  line-height:1.35;
+}
+.progress{
+  margin:14px auto 0;
+  width:86%;
+  height:8px;
+  background:rgba(255,255,255,.12);
+  border-radius:999px;
+  overflow:hidden;
+}
+.progress > div{
+  height:100%;
+  width:0%;
+  background:#fff;
+  animation:loadBar 2.2s linear forwards;
+}
+@keyframes loadBar{
+  to{width:100%}
+}
+</style>
+</head>
+
+<body>
+<div class="rain" id="rain"></div>
+
+<div class="main">
+
+<header>
+  <a href="https://nixware.cc/" target="_blank" class="logo">
+    <img src="logo.png" height="34" alt="logo"> IvanWare
+  </a>
+
+  <div class="right">
+    <input id="search" placeholder="Пошук">
+
+    <select id="cat">
+      <option value="all">Усі</option>
+      <option value="men">Чоловіче</option>
+      <option value="women">Жіноче</option>
+    </select>
+
+    <select id="price">
+      <option value="all">Всі</option>
+      <option value="1000">до 1000</option>
+      <option value="2000">до 2000</option>
+      <option value="3000">до 3000</option>
+    </select>
+
+    <div class="cart-btn" id="cartBtn">🛒 <span id="count">0</span></div>
+
+    <button class="login-btn" id="loginBtn">Вхід</button>
+    <div class="user-pill" id="userPill">
+      <span id="userName"></span>
+      <button class="login-btn" id="logoutBtn">Вийти</button>
+    </div>
+
+    <a class="link" href="about.html">Про автора</a>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-box">
+    <div>
+      <div class="hero-title">Premium одяг • IvanWare</div>
+      <div class="hero-sub">Пошук, фільтри, кошик — усе працює.</div>
+    </div>
+    <button class="hero-chip" onclick="document.getElementById('search').focus()">🔎 Почати</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="products" id="products"></div>
+</div>
+
+<!-- CART -->
+<div class="cart" id="cart">
+  <div class="cart-top">
+    <h2>Кошик</h2>
+    <button class="close" id="closeCart">❌</button>
+  </div>
+
+  <div id="cartItems" style="margin-top:10px;"></div>
+
+  <div class="total">Разом: <span id="total">0</span> ₴</div>
+
+  <hr style="margin:14px 0;border:none;border-top:1px solid rgba(0,0,0,.12)">
+
+  <div class="form-title"><b>Оформлення замовлення</b></div>
+  <input id="orderName" placeholder="Ваше імʼя">
+  <input id="orderPhone" placeholder="Номер телефону">
+  <input id="orderAddress" placeholder="Адреса доставки">
+
+  <button class="pay-btn" id="payBtn">💳 Оплатити</button>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="success" id="successBox">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Оплата успішна!</div>
+    <div class="success-text">
+      Дякуємо за замовлення.<br>
+      Товар вже їде до вас 🚚
+    </div>
+    <div class="progress"><div></div></div>
+  </div>
+</div>
+
+<div class="rip" id="ripBox">🥀🪦 rip 2025–2026 🪦🥀</div>
+<img id="meme" src="meme.jpg" alt="meme">
+
+<script>
+/* ===== elements ===== */
+const rain = document.getElementById("rain");
+const productsDiv = document.getElementById("products");
+
+const cartDiv = document.getElementById("cart");
+const cartBtn = document.getElementById("cartBtn");
+const closeCart = document.getElementById("closeCart");
+const cartItems = document.getElementById("cartItems");
+const totalEl = document.getElementById("total");
+const countEl = document.getElementById("count");
+
+const searchEl = document.getElementById("search");
+const catEl = document.getElementById("cat");
+const priceEl = document.getElementById("price");
+
+const loginBtn = document.getElementById("loginBtn");
+const userPill = document.getElementById("userPill");
+const userName = document.getElementById("userName");
+const logoutBtn = document.getElementById("logoutBtn");
+
+const ripBox = document.getElementById("ripBox");
+const meme = document.getElementById("meme");
+
+const orderName = document.getElementById("orderName");
+const orderPhone = document.getElementById("orderPhone");
+const orderAddress = document.getElementById("orderAddress");
+const payBtn = document.getElementById("payBtn");
+
+const successBox = document.getElementById("successBox");
+
+/* ===== rain ===== */
+for(let i=0;i<120;i++){
+  const d=document.createElement("div");
+  d.className="drop";
+  d.style.left=Math.random()*100+"vw";
+  d.style.animationDuration=(Math.random()*1+0.6)+"s";
+  d.style.animationDelay=(Math.random()*1)+"s";
+  rain.appendChild(d);
+}
+
+/* ===== products (8 фото) ===== */
+const products = [
+  {name:"Футболка", price:799,  img:"images/1.jpg", cat:"men"},
+  {name:"Худі",     price:1599, img:"images/2.jpg", cat:"men"},
+  {name:"Джинси",   price:1899, img:"images/3.jpg", cat:"men"},
+  {name:"Куртка",   price:2000, img:"images/4.jpg", cat:"men"},
+  {name:"Топ",      price:899,  img:"images/5.jpg", cat:"women"},
+  {name:"Спідниця", price:1199, img:"images/6.jpg", cat:"women"},
+  {name:"Сукня",    price:1999, img:"images/7.jpg", cat:"women"},
+  {name:"Світшот",  price:1399, img:"images/8.jpg", cat:"women"},
+];
+
+let cart = [];
+
+function render(list){
+  productsDiv.innerHTML = "";
+  list.forEach((p, idx)=>{
+    const delay = Math.min(idx * 70, 420);
+    productsDiv.innerHTML += `
+      <div class="card" style="--d:${delay}ms">
+        <img src="${p.img}" alt="${p.name}">
+        <div class="info">
+          <b>${p.name}</b>
+          <div class="price">${p.price} ₴</div>
+          <div class="tag">${p.cat === "men" ? "Чоловіче" : "Жіноче"}</div>
+          <button class="add">Додати</button>
+        </div>
+      </div>
+    `;
+  });
+
+  document.querySelectorAll(".add").forEach((btn, idx)=>{
+    btn.addEventListener("click", ()=> addToCart(list[idx]));
+  });
+}
+render(products);
+
+/* ===== cart ===== */
+function toggleCart(){ cartDiv.classList.toggle("open"); }
+cartBtn.addEventListener("click", toggleCart);
+closeCart.addEventListener("click", toggleCart);
+
+function addToCart(item){
+  cart.push(item);
+  updateCart();
+}
+function removeFromCart(index){
+  cart.splice(index, 1);
+  updateCart();
+}
+function updateCart(){
+  cartItems.innerHTML = "";
+  let total = 0;
+
+  cart.forEach((it, i)=>{
+    total += it.price;
+    cartItems.innerHTML += `
+      <div class="cart-item">
+        <div><b>${it.name}</b> <span style="opacity:.7">(${it.price} ₴)</span></div>
+        <div class="x" data-i="${i}">❌</div>
+      </div>
+    `;
+  });
+
+  totalEl.textContent = total;
+  countEl.textContent = cart.length;
+
+  document.querySelectorAll(".x").forEach(xbtn=>{
+    xbtn.addEventListener("click", ()=> removeFromCart(Number(xbtn.dataset.i)));
+  });
+}
+
+/* ===== search + filters ===== */
+function apply(){
+  const text = searchEl.value.toLowerCase().trim();
+  const cat = catEl.value;
+  const price = priceEl.value;
+
+  let list = products.slice();
+  if(cat !== "all") list = list.filter(x => x.cat === cat);
+  if(price !== "all") list = list.filter(x => x.price <= Number(price));
+  if(text) list = list.filter(x => x.name.toLowerCase().includes(text));
+
+  render(list);
+}
+searchEl.addEventListener("input", apply);
+catEl.addEventListener("change", apply);
+priceEl.addEventListener("change", apply);
+
+/* ===== login ===== */
+function syncUser(){
+  const u = localStorage.getItem("ivanware_user");
+  if(u){
+    userName.textContent = "Привіт, " + u;
+    loginBtn.style.display = "none";
+    userPill.style.display = "flex";
+  }else{
+    loginBtn.style.display = "inline-block";
+    userPill.style.display = "none";
+  }
+}
+loginBtn.addEventListener("click", ()=>{
+  const n = prompt("Ім'я:");
+  if(n && n.trim()){
+    localStorage.setItem("ivanware_user", n.trim());
+    syncUser();
+  }
+});
+logoutBtn.addEventListener("click", ()=>{
+  localStorage.removeItem("ivanware_user");
+  syncUser();
+});
+syncUser();
+
+/* ===== checkout ===== */
+function showSuccess(){
+  // перезапуск анимации прогресса
+  const bar = successBox.querySelector(".progress > div");
+  bar.style.animation = "none";
+  bar.offsetHeight; // reflow
+  bar.style.animation = "loadBar 2.2s linear forwards";
+
+  successBox.style.display = "flex";
+  setTimeout(()=>{ successBox.style.display = "none"; }, 2400);
+}
+
+function checkout(){
+  const name = orderName.value.trim();
+  const phone = orderPhone.value.trim();
+  const address = orderAddress.value.trim();
+
+  if(cart.length === 0){
+    alert("Кошик порожній");
+    return;
+  }
+  if(!name || !phone || !address){
+    alert("Будь ласка, заповніть усі поля");
+    return;
+  }
+
+  // делаем "успех"
+  showSuccess();
+
+  // очищаем корзину и закрываем
+  cart = [];
+  updateCart();
+
+  // очистить поля
+  orderName.value = "";
+  orderPhone.value = "";
+  orderAddress.value = "";
+
+  setTimeout(()=>{ if(cartDiv.classList.contains("open")) toggleCart(); }, 800);
+}
+
+payBtn.addEventListener("click", checkout);
+
+// клик по затемнению закрывает успех
+successBox.addEventListener("click", (e)=>{
+  if(e.target === successBox) successBox.style.display = "none";
+});
+
+/* ===== keys ===== */
+function showRip(){
+  ripBox.style.display="block";
+  setTimeout(()=> ripBox.style.display="none", 2500);
+}
+function showMeme(){
+  meme.style.display="block";
+  setTimeout(()=> meme.style.display="none", 3000);
+}
+document.addEventListener("keydown", (e)=>{
+  const k = e.key.toLowerCase();
+  if(k === "p") showRip();
+  if(k === "o") showMeme();
+});
+</script>
+
+</div>
+</body>
+</html>

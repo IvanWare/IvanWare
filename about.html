@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Учасники проєкту — IvanWare</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial}
+
+/* ===== RAIN ===== */
+.rain{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+}
+.drop{
+  position:absolute;
+  width:2px;
+  height:22px;
+  background:linear-gradient(to bottom, rgba(150,190,200,.9), transparent);
+  animation:fall linear infinite;
+}
+@keyframes fall{
+  from{transform:translateY(-120px)}
+  to{transform:translateY(110vh)}
+}
+
+/* ===== BODY ===== */
+body{
+  background:#0c0c0c;
+  color:white;
+  min-height:100vh;
+}
+.main{
+  position:relative;
+  z-index:1;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ===== CARD ===== */
+.card{
+  background:#141414;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:26px;
+  padding:38px 34px;
+  max-width:580px;
+  width:92%;
+  text-align:center;
+  box-shadow:0 0 45px rgba(255,255,255,.06);
+  animation:cardIn .7s ease;
+}
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(30px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+h1{
+  font-size:30px;
+  margin-bottom:6px;
+}
+.subtitle{
+  opacity:.75;
+  margin-bottom:16px;
+}
+
+.line{
+  width:72px;
+  height:3px;
+  background:#fff;
+  margin:0 auto 24px;
+  border-radius:3px;
+  animation:pulse 2s infinite;
+}
+@keyframes pulse{
+  0%,100%{opacity:.4}
+  50%{opacity:1}
+}
+
+/* ===== PARTICIPANTS ===== */
+.list{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.item{
+  background:#0f0f0f;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:18px;
+  padding:18px 18px;
+  opacity:0;
+  transform:translateY(14px);
+  animation:itemIn .6s ease forwards;
+}
+.item:nth-child(1){animation-delay:.3s}
+.item:nth-child(2){animation-delay:.6s}
+.item:nth-child(3){animation-delay:.9s}
+
+@keyframes itemIn{
+  to{opacity:1;transform:translateY(0)}
+}
+
+.item:hover{
+  border-color:rgba(255,255,255,.25);
+  transform:scale(1.02);
+  transition:.25s;
+}
+
+.name{
+  font-weight:900;
+  font-size:19px;
+}
+.desc{
+  opacity:.85;
+  margin-top:6px;
+  line-height:1.4;
+}
+
+/* ===== FOOTER ===== */
+.note{
+  margin-top:26px;
+  font-style:italic;
+  opacity:.8;
+}
+
+/* ===== BACK ===== */
+.back{
+  display:inline-block;
+  margin-top:28px;
+  padding:12px 22px;
+  background:white;
+  color:black;
+  text-decoration:none;
+  border-radius:14px;
+  font-weight:900;
+}
+.back:hover{opacity:.9}
+</style>
+</head>
+
+<body>
+
+<div class="rain" id="rain"></div>
+
+<div class="main">
+  <div class="card">
+    <h1>Учасники проєкту</h1>
+    <div class="subtitle">Хто працював над IvanWare</div>
+    <div class="line"></div>
+
+    <div class="list">
+      <div class="item">
+        <div class="name">👨‍💻 Григоращенко Іван</div>
+        <div class="desc">
+          Автор проєкту<br>
+          Дизайн, верстка, JavaScript
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="name">🎮 Ратмирчик</div>
+        <div class="desc">
+          Ідеї та тестування<br>
+          Пристрій: 📱 Poco X3 Pro
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="name">🕹 Михасик228</div>
+        <div class="desc">
+          Участь у проєкті<br>
+          Онлайн-нікнейм
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      Проєкт створений у навчальних цілях.<br>
+      Магазин є демонстраційним.
+    </div>
+
+    <a class="back" href="index.html">⬅ Повернутись до магазину</a>
+  </div>
+</div>
+
+<script>
+/* ===== RAIN SCRIPT ===== */
+const rain = document.getElementById("rain");
+for(let i=0;i<120;i++){
+  const d=document.createElement("div");
+  d.className="drop";
+  d.style.left=Math.random()*100+"vw";
+  d.style.animationDuration=(Math.random()*1+0.6)+"s";
+  d.style.animationDelay=(Math.random()*1)+"s";
+  rain.appendChild(d);
+}
+</script>
+
+</body>
+</html>
